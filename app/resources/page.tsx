@@ -1,25 +1,37 @@
-const resources = [
-  {
-    subject: "Signals and Systems",
-    semester: "Semester 3",
-    type: "Notes",
-    uploadedBy: "Shri",
-  },
-  {
-    subject: "Digital Signal Processing",
-    semester: "Semester 4",
-    type: "Previous Year Paper",
-    uploadedBy: "Arun",
-  },
-  {
-    subject: "Network Theory",
-    semester: "Semester 2",
-    type: "Lab Manual",
-    uploadedBy: "Priya",
-  },
-];
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+type Resource = {
+  id: number;
+  subject: string;
+  semester: string;
+  resource_type: string;
+  uploaded_by: string;
+};
 
 export default function ResourcesPage() {
+
+  const [resources, setResources] = useState<Resource[]>([]);
+
+  useEffect(() => {
+    fetchResources();
+  }, []);
+
+  async function fetchResources() {
+
+    const { data, error } = await supabase
+      .from("resources")
+      .select("*");
+
+    if (error) {
+      console.log(error);
+    } else {
+      setResources(data);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-white px-6 py-12">
 
@@ -30,16 +42,15 @@ export default function ResourcesPage() {
         </h1>
 
         <p className="text-slate-300 mb-10">
-          Browse notes, previous year papers, lab manuals,
-          and academic materials uploaded by students.
+          Resources stored in Supabase database.
         </p>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          {resources.map((resource, index) => (
+          {resources.map((resource) => (
 
             <div
-              key={index}
+              key={resource.id}
               className="bg-slate-900 border border-slate-800 rounded-2xl p-6"
             >
 
@@ -52,18 +63,12 @@ export default function ResourcesPage() {
               </p>
 
               <p className="text-cyan-400 mb-2">
-                {resource.type}
+                {resource.resource_type}
               </p>
 
-              <p className="text-sm text-slate-400 mb-6">
-                Uploaded by {resource.uploadedBy}
+              <p className="text-sm text-slate-400">
+                Uploaded by {resource.uploaded_by}
               </p>
-
-              <button
-                className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-semibold py-3 rounded-xl"
-              >
-                Download
-              </button>
 
             </div>
 
