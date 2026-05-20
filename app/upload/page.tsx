@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function UploadPage() {
@@ -10,6 +10,16 @@ export default function UploadPage() {
   const [department, setDepartment] = useState("");
   const [resourceType, setResourceType] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    };
+
+    fetchUser();
+  }, []);
 
   async function handleUpload(e: React.FormEvent) {
 
@@ -71,7 +81,13 @@ export default function UploadPage() {
           Share notes, previous year papers, lab manuals,
           and useful academic resources with other students.
         </p>
+        {!user && (
 
+  <div className="bg-red-500/20 border border-red-500 text-red-300 p-4 rounded-xl mb-6">
+    Please login first to upload resources.
+  </div>
+
+)}
         <form
           onSubmit={handleUpload}
           className="space-y-6 bg-slate-900 p-8 rounded-2xl border border-slate-800"
